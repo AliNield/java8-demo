@@ -8,13 +8,6 @@ public class StreamDemo {
 
     private List<Person> people;
 
-    private Predicate<Person> isPersonYoungerThan10 = new Predicate<Person>() {
-        @Override
-        public boolean test(Person person) {
-            return person.getAge() < 10;
-        }
-    };
-
     private Predicate<Integer> isGreaterThan10Lambda  = i -> i < 10;
 
     public StreamDemo() {
@@ -29,19 +22,29 @@ public class StreamDemo {
                 new Person("Zoe", LocalDate.of(1968, Month.FEBRUARY, 11)));
     }
 
+    public void sortPeopleByAge() {
+        Comparator<Person> ageComparator = new Comparator<Person>() {
+            @Override
+            public int compare(Person p1, Person p2) {
+                return Long.compare(p1.getAge(), p2.getAge());
+            }
+        };
+
+        people.sort(ageComparator);
+        people.sort((p1, p2) -> Long.compare(p1.getAge(), p2.getAge()));
+        people.sort(Person::compareByAge);
+    }
+
     public void findPeopleOlderThan25() {
         System.out.println("People older than 25");
         List<Person> peopleOlderThan25 = people.stream()
                                             .filter(person -> person.getAge() > 25)
-                                            .peek(System.out::println)
                                             .collect(Collectors.toCollection(ArrayList::new));
 
-        System.out.println("People younger than 10");
+        Predicate<Person> isPersonYoungerThan10 = person -> person.getAge() < 10;
         List <Person> peopleOlderThan10 = people.stream()
                                             .filter(isPersonYoungerThan10)
-                                            .peek(System.out::println)
                                             .collect(Collectors.toList());
-
     }
 
     public void getAverageAge() {
@@ -49,21 +52,18 @@ public class StreamDemo {
                                 .mapToDouble(Person::getAge)
                                 .average()
                                 .getAsDouble();
-        System.out.println("Average age is: " + averageAge);
     }
 
     public void findPersonWithTheNextBirthday() {
         Comparator<Person> birthdayComparator = Comparator.comparing(Person::getMonthofDateOfBirth)
                                                                 .thenComparing(Person::getDayOfDateOfBirth);
-        people.sort(birthdayComparator);
-
         Person personWithNextBirthday = people.stream()
                 .sorted(birthdayComparator)
                 .filter(person -> person.getMonthofDateOfBirth() >= LocalDate.now().getMonthValue())
                 .findFirst()
                 .get();
 
-        System.out.println(personWithNextBirthday);
+        System.out.println("Person with the next birthday is: " + personWithNextBirthday);
     }
 
     public static void main(String[] args) {
@@ -71,7 +71,7 @@ public class StreamDemo {
         streamDemo.findPeopleOlderThan25();
         streamDemo.getAverageAge();
         streamDemo.findPersonWithTheNextBirthday();
+        streamDemo.sortPeopleByAge();
     }
-
 
 }

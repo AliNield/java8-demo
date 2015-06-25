@@ -1,6 +1,7 @@
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.StringJoiner;
 
 public class Person {
@@ -39,6 +40,10 @@ public class Person {
 
     public int getMonthofDateOfBirth() {
         return dateOfBirth.getMonthValue();
+    }
+
+    public static int compareByAge(Person a, Person b) {
+        return Long.compare(a.getAge(), b.getAge());
     }
 
     @Override
